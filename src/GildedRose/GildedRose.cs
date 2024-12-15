@@ -1,5 +1,6 @@
 ﻿namespace GildedRoseKata
 {
+    using System;
     using System.Collections.Generic;
     public class GildedRose
     {
@@ -18,12 +19,9 @@
             foreach (var item in Items)
             {
                 // degrade quality before degrading sellin
-                if (item.Name != AgedBrie && item.Name != BackstagePasses)
+                if (item.Name != AgedBrie && item.Name != BackstagePasses && item.Name != Sulfuras)
                 {
-                    if (item.Quality > 0 && item.Name != Sulfuras)
-                    {
-                        item.Quality--;
-                    }
+                    item.Quality = Math.Max(0, item.Quality-1);                    
                 }
                 else
                 {
