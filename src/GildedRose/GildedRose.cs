@@ -2,21 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+
     public class GildedRose
     {
-        private const string AgedBrie = "Aged Brie";
-        private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
-        private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
-        private const string Conjured = "Conjured Mana Cake";
-
         private const int MaxStandardQuality = 50;
+        private const int MinimumStandardQuality = 0;
 
-        Dictionary<string, Func<Item, (int, int)>> adjustmentMap = new()
+        // Functions for applying end of day item adjustments are here.
+        // For new items or changes in item quality degradation, define function and include it in this map for it to be applied.
+        Dictionary<string, Func<Item, (int, int)>> endOfDayAdjustmentFunctions = new()
             {
-                { AgedBrie, AgedBrieEndOfDayAdjustment },
-                { BackstagePasses, BackstagePassesEndOfDayAdjustment },
-                { Sulfuras, SulfurasEndOfDayAdjustment },
-                { Conjured, ConjuredEndOfDayAdjustment },
+                { "Aged Brie", AgedBrieEndOfDayAdjustment },
+                { "Backstage passes", BackstagePassesEndOfDayAdjustment },
+                { "Sulfuras", SulfurasEndOfDayAdjustment },
+                { "Conjured", ConjuredEndOfDayAdjustment },
                 { "*", DefaultEndOfDayAdjustment },
             };
 
@@ -30,7 +30,9 @@
         {
             foreach (var item in Items)
             {
-                var endOfDayAdjustmentFunction = adjustmentMap.GetValueOrDefault(item.Name, DefaultEndOfDayAdjustment);
+                var endOfDayAdjustmentFunction = endOfDayAdjustmentFunctions
+                    .SingleOrDefault(kvp => item.Name.StartsWith(kvp.Key)).Value
+                    ?? DefaultEndOfDayAdjustment;
 
                 var (sellin, quality) = endOfDayAdjustmentFunction(item);
                 item.SellIn = sellin;
@@ -49,8 +51,8 @@
         private static (int sellIn, int quality) ConjuredEndOfDayAdjustment(Item item)
         {
             var newQuality = item.SellIn > 0
-                        ? Math.Max(0, item.Quality - 2)
-                        : Math.Max(0, item.Quality - 4);
+                        ? Math.Max(MinimumStandardQuality, item.Quality - 2)
+                        : Math.Max(MinimumStandardQuality, item.Quality - 4);
             return (item.SellIn - 1, newQuality);
         }
 
@@ -58,7 +60,7 @@
         {
             var newQuality = item.SellIn switch
             {
-                <= 0 => 0,
+                <= 0 => MinimumStandardQuality,
                 < 6 => Math.Min(MaxStandardQuality, item.Quality + 3),
                 < 11 => Math.Min(MaxStandardQuality, item.Quality + 2),
                 _ => Math.Min(MaxStandardQuality, item.Quality + 1),
@@ -72,8 +74,8 @@
         private static (int sellIn, int quality) DefaultEndOfDayAdjustment(Item item)
         {
             var newQuality = item.SellIn > 0
-                       ? Math.Max(0, item.Quality - 1)
-                       : Math.Max(0, item.Quality - 2);
+                       ? Math.Max(MinimumStandardQuality, item.Quality - 1)
+                       : Math.Max(MinimumStandardQuality, item.Quality - 2);
             return (item.SellIn - 1, newQuality);
         }
     }
