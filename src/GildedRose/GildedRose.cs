@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace GildedRoseKata
+﻿namespace GildedRoseKata
 {
+    using System.Collections.Generic;
     public class GildedRose
     {
         IList<Item> Items;
