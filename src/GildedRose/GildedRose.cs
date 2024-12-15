@@ -7,6 +7,7 @@
         private const string AgedBrie = "Aged Brie";
         private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
         private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
+        private const string Conjured = "Conjured Mana Cake";
 
         private const int MaxStandardQuality = 50;
 
@@ -43,6 +44,10 @@
                             < 11 => Math.Min(MaxStandardQuality, item.Quality + 2),
                             _ => Math.Min(MaxStandardQuality, item.Quality + 1),
                         },
+
+                    Conjured => item.SellIn > 0
+                        ? Math.Max(0, item.Quality - 2)
+                        : Math.Max(0, item.Quality - 4),
 
                     _ => item.Quality = item.SellIn > 0 
                         ? Math.Max(0, item.Quality - 1)
