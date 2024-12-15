@@ -4,10 +4,8 @@
     using Xunit;
     using System.Collections.Generic;
     using FluentAssertions;
-    using System.ComponentModel;
-    using System.CodeDom;
 
-    public class GildedRoseTest
+    public class UpdateQualityTests
     {
         [Theory]
         [Trait("Category", "Standard Item")]
@@ -22,7 +20,7 @@
         [InlineData("Backstage passes to a TAFKAL80ETC concert", 0)]
         [InlineData("Conjured Mana Cake", 0)]
 
-        public void UpdateQuality_Should_Reduce_SellIn_By_1_Except_Sulfuras(string itemName, int currentSellIn)
+        public void SellIn_Should_Reduce_By_1_Except_Sulfuras(string itemName, int currentSellIn)
         {
             var items = new List<Item> { new Item { Name=itemName, SellIn = currentSellIn } };
             GildedRose sut = new GildedRose(items);
@@ -38,7 +36,7 @@
         [InlineData("Sulfuras, Hand of Ragnaros", 0)]
         [InlineData("Sulfuras, Hand of Ragnaros", -1)]
 
-        public void UpdateQuality_Should_Never_Reduce_SellIn_For_Sulfuras(string itemName, int currentSellIn)
+        public void SellIn_Should_Never_Reduce_For_Sulfuras(string itemName, int currentSellIn)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = 1 } };
             GildedRose app = new GildedRose(items);
@@ -55,7 +53,7 @@
         [InlineData("Sulfuras, Hand of Ragnaros", 0)]
         [InlineData("Sulfuras, Hand of Ragnaros", -1)]
 
-        public void UpdateQuality_Quality_Should_Never_Degrade_For_Sulfuras(string itemName, int currentSellIn)
+        public void Quality_Should_Never_Degrade_For_Sulfuras(string itemName, int currentSellIn)
         {
             const int Sulfuras_Quality = 80;
             var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = Sulfuras_Quality } };
@@ -72,7 +70,7 @@
         [InlineData("+5 Dexterity Vest", 2)]
         [InlineData("Elixir of the Mongoose", 2)]
         [InlineData("Conjured Mana Cake", 2)]
-        public void UpdateQuality_Quality_Should_Degrade_By_1_When_SellIn_Has_Not_Passed(string itemName, int currentQuality)
+        public void Quality_Should_Degrade_By_1_When_SellIn_Has_Not_Passed(string itemName, int currentQuality)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn=1, Quality = currentQuality } };
             GildedRose app = new GildedRose(items);
@@ -87,7 +85,7 @@
         [InlineData("+5 Dexterity Vest", 2)]
         [InlineData("Elixir of the Mongoose", 2)]
         [InlineData("Conjured Mana Cake", 2)]
-        public void UpdateQuality_Quality_Should_Degrade_By_2_When_SellIn_Has_Passed(string itemName, int currentQuality)
+        public void Quality_Should_Degrade_By_2_When_SellIn_Has_Passed(string itemName, int currentQuality)
         {            
             var items = new List<Item> { new Item { Name = itemName, SellIn = -1, Quality = currentQuality } };
             GildedRose app = new GildedRose(items);
@@ -102,7 +100,7 @@
         [InlineData("+5 Dexterity Vest", 1)]
         [InlineData("Elixir of the Mongoose", 1)]
         [InlineData("Conjured Mana Cake", 1)]
-        public void UpdateQuality_Quality_Should_Not_Degrade_Below_Zero(string itemName, int currentQuality)
+        public void Quality_Should_Not_Degrade_Below_Zero(string itemName, int currentQuality)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn = 5, Quality = currentQuality } };
             GildedRose app = new GildedRose(items);
@@ -117,7 +115,7 @@
         [InlineData("Aged Brie", 2, 3)]
         [InlineData("Aged Brie", 1, 1)]
 
-        public void UpdateQuality_Quality_Should_Increase_For_AgedBrie(string itemName, int currentSellIn, int currentQuality)
+        public void Quality_Should_Increase_For_AgedBrie(string itemName, int currentSellIn, int currentQuality)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = currentQuality } };
             GildedRose sut = new GildedRose(items);
@@ -131,7 +129,7 @@
         [Trait("Category", "Aged Brie")]
         [InlineData("Aged Brie", 2, 50)]
 
-        public void UpdateQuality_Quality_Should_Not_Increase_Beyond_50_For_AgedBrie()        
+        public void Quality_Should_Not_Increase_Beyond_50_For_AgedBrie()        
         {
             var items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 2, Quality = 50} };
             GildedRose sut = new GildedRose(items);
