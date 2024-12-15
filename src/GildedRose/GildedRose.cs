@@ -7,6 +7,7 @@
         private const string AgedBrie = "Aged Brie";
         private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
         private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
+        private const int MaxQuality = 50;
 
         IList<Item> Items;
         public GildedRose(IList<Item> Items)
@@ -25,18 +26,18 @@
                 }
                 else
                 {
-                    if (item.Quality < 50)
+                    if (item.Quality < MaxQuality)
                     {
                         item.Quality++;
 
                         if (item.Name == BackstagePasses)
                         {
-                            if (item.SellIn < 11 && item.Quality < 50)
+                            if (item.SellIn < 11 && item.Quality < MaxQuality)
                             {
                                 item.Quality++;
                             }
 
-                            if (item.SellIn < 6 && item.Quality < 50)
+                            if (item.SellIn < 6 && item.Quality < MaxQuality)
                             {
                                 item.Quality++;
                             }
@@ -70,7 +71,7 @@
                     }
                     else
                     {
-                        if (item.Quality < 50)
+                        if (item.Quality < MaxQuality)
                         {
                             item.Quality++;
                         }
