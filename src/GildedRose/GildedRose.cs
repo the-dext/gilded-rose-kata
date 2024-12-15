@@ -56,7 +56,11 @@
                 }
 
                 // reduce sell-in
-                if (item.Name != Sulfuras)
+                if (item.Name == Sulfuras)
+                {
+                    continue;
+                }
+                else
                 {
                     item.SellIn--;
                 }
@@ -69,11 +73,8 @@
                         if (item.Name != BackstagePasses)
                         {
                             if (item.Quality > 0)
-                            {
-                                if (item.Name != Sulfuras)
-                                {
-                                    item.Quality--;
-                                }
+                            {                                
+                                item.Quality--;                                
                             }
                         }
                         else

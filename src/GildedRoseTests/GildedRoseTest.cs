@@ -38,7 +38,8 @@
 
         public void SellIn_Should_Never_Reduce_For_Sulfuras(string itemName, int currentSellIn)
         {
-            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = 1 } };
+            const int Sulfuras_Quality = 80;
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = Sulfuras_Quality } };
             GildedRose app = new GildedRose(items);
 
             app.UpdateQuality();
