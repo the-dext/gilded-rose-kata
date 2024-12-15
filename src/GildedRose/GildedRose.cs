@@ -11,6 +11,15 @@
 
         private const int MaxStandardQuality = 50;
 
+        Dictionary<string, Func<Item, (int, int)>> adjustmentMap = new()
+            {
+                { AgedBrie, AgedBrieEndOfDayAdjustment },
+                { BackstagePasses, BackstagePassesEndOfDayAdjustment },
+                { Sulfuras, SulfurasEndOfDayAdjustment },
+                { Conjured, ConjuredEndOfDayAdjustment },
+                { "*", DefaultEndOfDayAdjustment },
+            };
+
         IList<Item> Items;
         public GildedRose(IList<Item> Items)
         {
@@ -21,42 +30,51 @@
         {
             foreach (var item in Items)
             {
-                if (item.Name == Sulfuras)
-                {
-                    continue;
-                }
+                var endOfDayAdjustmentFunction = adjustmentMap.GetValueOrDefault(item.Name, DefaultEndOfDayAdjustment);
 
-                // degrade quality before degrading sellin
-                item.Quality = item.Name switch
-                {
-                    Sulfuras => throw new InvalidOperationException("Sulfuras should never change quality"),
-                    
-                    AgedBrie => item.SellIn > 0 
-                        ? Math.Min(MaxStandardQuality, item.Quality + 1)
-                        : Math.Min(MaxStandardQuality, item.Quality + 2),
-
-
-                    BackstagePasses =>
-                        item.SellIn switch
-                        {
-                            <= 0 => 0,
-                            < 6 => Math.Min(MaxStandardQuality, item.Quality + 3),
-                            < 11 => Math.Min(MaxStandardQuality, item.Quality + 2),
-                            _ => Math.Min(MaxStandardQuality, item.Quality + 1),
-                        },
-
-                    Conjured => item.SellIn > 0
-                        ? Math.Max(0, item.Quality - 2)
-                        : Math.Max(0, item.Quality - 4),
-
-                    _ => item.Quality = item.SellIn > 0 
-                        ? Math.Max(0, item.Quality - 1)
-                        : Math.Max(0, item.Quality - 2)
-                };
-
-                // reduce sell-in                
-                item.SellIn--;   
+                var (sellin, quality) = endOfDayAdjustmentFunction(item);
+                item.SellIn = sellin;
+                item.Quality = quality;
             }
+        }
+
+        private static (int sellIn, int quality) AgedBrieEndOfDayAdjustment(Item item)
+        {
+            var newQuality = item.SellIn > 0
+                        ? Math.Min(MaxStandardQuality, item.Quality + 1)
+                        : Math.Min(MaxStandardQuality, item.Quality + 2);
+            return (item.SellIn - 1, newQuality);
+        }
+
+        private static (int sellIn, int quality) ConjuredEndOfDayAdjustment(Item item)
+        {
+            var newQuality = item.SellIn > 0
+                        ? Math.Max(0, item.Quality - 2)
+                        : Math.Max(0, item.Quality - 4);
+            return (item.SellIn - 1, newQuality);
+        }
+
+        private static (int sellIn, int quality) BackstagePassesEndOfDayAdjustment(Item item)
+        {
+            var newQuality = item.SellIn switch
+            {
+                <= 0 => 0,
+                < 6 => Math.Min(MaxStandardQuality, item.Quality + 3),
+                < 11 => Math.Min(MaxStandardQuality, item.Quality + 2),
+                _ => Math.Min(MaxStandardQuality, item.Quality + 1),
+            };
+            return (item.SellIn - 1, newQuality);
+        }
+
+        private static (int sellIn, int quality) SulfurasEndOfDayAdjustment(Item item)
+            => (item.SellIn, item.Quality);
+
+        private static (int sellIn, int quality) DefaultEndOfDayAdjustment(Item item)
+        {
+            var newQuality = item.SellIn > 0
+                       ? Math.Max(0, item.Quality - 1)
+                       : Math.Max(0, item.Quality - 2);
+            return (item.SellIn - 1, newQuality);
         }
     }
 }
