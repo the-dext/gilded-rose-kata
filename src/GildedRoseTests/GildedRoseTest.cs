@@ -1,9 +1,9 @@
-﻿using Xunit;
-using System.Collections.Generic;
-using GildedRoseKata;
-
-namespace GildedRoseTests
+﻿namespace GildedRoseTests
 {
+    using Xunit;
+    using System.Collections.Generic;
+    using GildedRoseKata;
+
     public class GildedRoseTest
     {
         [Fact]
