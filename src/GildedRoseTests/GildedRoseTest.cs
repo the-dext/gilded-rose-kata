@@ -138,5 +138,34 @@
 
             items[0].Quality.Should().Be(50);
         }
+
+        [Trait("Category", "Backstage Passes")]
+        [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 11, 3, 4)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 10, 3, 5)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 5, 3, 6)]
+        public void Quality_Increases_As_Sellin_Approaches_For_Backstage_Passes(string itemName, int currentSellIn, int currentQuality, int expectedQuality)
+        {
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = currentQuality } };
+            GildedRose sut = new GildedRose(items);
+
+            sut.UpdateQuality();
+
+            items[0].Quality.Should().Be(expectedQuality);
+        }
+
+        [Trait("Category", "Backstage Passes")]
+        [Theory]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", 0, 3, 0)]
+        [InlineData("Backstage passes to a TAFKAL80ETC concert", -1, 3, 0)]
+        public void Quality_Becomes_Zero_After_Sellin_For_Backstage_Passes(string itemName, int currentSellIn, int currentQuality, int expectedQuality)
+        {
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = currentQuality } };
+            GildedRose sut = new GildedRose(items);
+
+            sut.UpdateQuality();
+
+            items[0].Quality.Should().Be(expectedQuality);
+        }
     }
 }
