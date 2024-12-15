@@ -127,7 +127,6 @@
 
         [Fact]
         [Trait("Category", "Aged Brie")]
-        [InlineData("Aged Brie", 2, 50)]
 
         public void Quality_Should_Not_Increase_Beyond_50_For_AgedBrie()        
         {
