@@ -7,7 +7,9 @@
         private const string AgedBrie = "Aged Brie";
         private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
         private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
-        private const int MaxQuality = 50;
+
+        private const int SulfurasQuality = 50;
+        private const int MaxStandardQuality = 50;
 
         IList<Item> Items;
         public GildedRose(IList<Item> Items)
@@ -19,41 +21,34 @@
         {
             foreach (var item in Items)
             {
+                int maxQualityAllowed = item.Name == Sulfuras 
+                    ? 80 
+                    : MaxStandardQuality;
+
+
                 // degrade quality before degrading sellin
-                if (item.Name != AgedBrie && item.Name != BackstagePasses && item.Name != Sulfuras)
+                item.Quality = item.Name switch
                 {
-                    item.Quality = Math.Max(0, item.Quality - 1);
-                }
-                else
-                {
-                    if (item.Quality < MaxQuality)
-                    {
-                        item.Quality++;
-
-                        if (item.Name == BackstagePasses)
+                    Sulfuras => item.Quality,
+                    AgedBrie => item.Quality = Math.Min(maxQualityAllowed, item.Quality + 1),
+                    BackstagePasses =>
+                        item.SellIn switch
                         {
-                            if (item.SellIn < 11 && item.Quality < MaxQuality)
-                            {
-                                item.Quality++;
-                            }
+                            < 6 => Math.Min(maxQualityAllowed, item.Quality + 3),
+                            < 11 => Math.Min(maxQualityAllowed, item.Quality + 2),
+                            _ => Math.Min(maxQualityAllowed, item.Quality + 1),
+                        },
 
-                            if (item.SellIn < 6 && item.Quality < MaxQuality)
-                            {
-                                item.Quality++;
-                            }
-                        }
-                    }
-                }
+                    _ => item.Quality = Math.Max(0, item.Quality - 1),
+                };
 
                 // reduce sell-in
                 if (item.Name == Sulfuras)
                 {
                     continue;
                 }
-                else
-                {
-                    item.SellIn--;
-                }
+                
+                item.SellIn--;                
 
                 if (item.SellIn >= 0)
                 {
@@ -63,7 +58,7 @@
                 // degrade quality again when passed sell-in date
                 item.Quality = item.Name switch
                 {
-                    AgedBrie => Math.Min(MaxQuality, item.Quality + 1),
+                    AgedBrie => Math.Min(maxQualityAllowed, item.Quality + 1),
                     BackstagePasses => 0,
                     _ => Math.Max(0, item.Quality - 1)
                 };          
