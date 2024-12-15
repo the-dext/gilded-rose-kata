@@ -22,7 +22,7 @@
                 // degrade quality before degrading sellin
                 if (item.Name != AgedBrie && item.Name != BackstagePasses && item.Name != Sulfuras)
                 {
-                    item.Quality = Math.Max(0, item.Quality-1);                    
+                    item.Quality = Math.Max(0, item.Quality - 1);
                 }
                 else
                 {
@@ -55,28 +55,24 @@
                     item.SellIn--;
                 }
 
-                // degrade quality again when passed sell-in date
-                if (item.SellIn < 0)
+                if (item.SellIn >= 0)
                 {
-                    if (item.Name != AgedBrie)
-                    {
-                        if (item.Name != BackstagePasses && item.Quality > 0)
-                        {
-                            item.Quality--;
-                        }
-                        else
-                        {
-                            item.Quality = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (item.Quality < MaxQuality)
-                        {
-                            item.Quality++;
-                        }
-                    }
+                    continue;
                 }
+
+                // degrade quality again when passed sell-in date
+                if (item.Name == AgedBrie)
+                {
+                    item.Quality = Math.Min(MaxQuality, item.Quality + 1);
+                }
+                else if (item.Name == BackstagePasses)
+                {
+                    item.Quality = 0;
+                }
+                else
+                {
+                    item.Quality = Math.Max(0, item.Quality - 1);
+                }                
             }
         }
     }
