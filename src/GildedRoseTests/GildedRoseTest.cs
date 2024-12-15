@@ -70,7 +70,6 @@
         [Trait("Category", "Standard Items")]
         [InlineData("+5 Dexterity Vest", 2)]
         [InlineData("Elixir of the Mongoose", 2)]
-        [InlineData("Conjured Mana Cake", 2)]
         public void Standard_Item_Quality_Should_Degrade_By_1_When_SellIn_Has_Not_Passed(string itemName, int currentQuality)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn=1, Quality = currentQuality } };
@@ -85,7 +84,6 @@
         [Trait("Category", "Standard Items")]
         [InlineData("+5 Dexterity Vest", 2)]
         [InlineData("Elixir of the Mongoose", 2)]
-        [InlineData("Conjured Mana Cake", 2)]
         public void Standard_Item_Quality_Should_Degrade_By_2_When_SellIn_Has_Passed(string itemName, int currentQuality)
         {            
             var items = new List<Item> { new Item { Name = itemName, SellIn = -1, Quality = currentQuality } };
@@ -100,7 +98,6 @@
         [Trait("Category", "Standard Items")]
         [InlineData("+5 Dexterity Vest", 1)]
         [InlineData("Elixir of the Mongoose", 1)]
-        [InlineData("Conjured Mana Cake", 1)]
         public void Standard_Item_Quality_Should_Not_Degrade_Below_Zero(string itemName, int currentQuality)
         {
             var items = new List<Item> { new Item { Name = itemName, SellIn = 5, Quality = currentQuality } };
@@ -166,6 +163,46 @@
             sut.UpdateQuality();
 
             items[0].Quality.Should().Be(expectedQuality);
+        }
+
+        [Fact]
+        [Trait("Category", "Standard Items")]
+        public void Conjured_Item_Quality_Should_Degrade_By_Two_When_SellIn_Has_Not_Passed()
+        {
+            const int expectedQuality = 3;
+
+            var items = new List<Item> { new Item { Name = "Conjured Mana Cake", SellIn = 5, Quality = 5 } };
+            GildedRose app = new GildedRose(items);
+
+            app.UpdateQuality();
+
+            items[0].Quality.Should().Be(expectedQuality);
+        }
+
+        [Fact]
+        [Trait("Category", "Conjured Items")]
+        public void Conjured_Item_Quality_Should_Degrade_By_Four_When_SellIn_Has_Passed()
+        {
+            const int expectedQuality = 1;
+
+            var items = new List<Item> { new Item { Name = "Conjured Mana Cake", SellIn = -1, Quality = 5 } };
+            GildedRose app = new GildedRose(items);
+
+            app.UpdateQuality();
+
+            items[0].Quality.Should().Be(expectedQuality);
+        }
+
+        [Fact]
+        [Trait("Category", "Conjured Items")]
+        public void Conjured_Item_Quality_Should_Not_Degrade_Below_Zero()
+        {
+            var items = new List<Item> { new Item { Name = "Conjured Mana Cake", SellIn = 10, Quality = 1 } };
+            GildedRose app = new GildedRose(items);
+
+            app.UpdateQuality();
+
+            items[0].Quality.Should().Be(0);
         }
     }
 }
