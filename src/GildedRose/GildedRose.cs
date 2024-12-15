@@ -28,18 +28,24 @@
 
         public void UpdateQuality()
         {
-            foreach (var item in Items)
-            {
-                var endOfDayAdjustmentFunction = endOfDayAdjustmentFunctions
-                    .SingleOrDefault(kvp => item.Name.StartsWith(kvp.Key)).Value
-                    ?? DefaultEndOfDayAdjustment;
+            Func<Item, (int, int)> GetEndOfDayAdjustmentFunction (string itemName) =>
+                endOfDayAdjustmentFunctions.SingleOrDefault(kvp => itemName.StartsWith(kvp.Key)).Value
+                ?? DefaultEndOfDayAdjustment;
 
-                var (sellin, quality) = endOfDayAdjustmentFunction(item);
+            foreach (var item in Items)
+            {                
+                var (sellin, quality) = GetEndOfDayAdjustmentFunction(item.Name)(item);
                 item.SellIn = sellin;
                 item.Quality = quality;
             }
         }
 
+        /// <summary>
+        /// Accepts an item and applies end of day quality adjustment rules applicable to Aged Brie items.
+        /// Returns the new Quality and SellIn values. Does not modifie the Item.
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns>Tuple of (int sellIn, int quality)</returns>
         private static (int sellIn, int quality) AgedBrieEndOfDayAdjustment(Item item)
         {
             var newQuality = item.SellIn > 0
@@ -48,14 +54,12 @@
             return (item.SellIn - 1, newQuality);
         }
 
-        private static (int sellIn, int quality) ConjuredEndOfDayAdjustment(Item item)
-        {
-            var newQuality = item.SellIn > 0
-                        ? Math.Max(MinimumStandardQuality, item.Quality - 2)
-                        : Math.Max(MinimumStandardQuality, item.Quality - 4);
-            return (item.SellIn - 1, newQuality);
-        }
-
+        /// <summary>
+        /// Accepts an item and applies end of day quality adjustment rules applicable to Backstage pass items.
+        /// Returns the new Quality and SellIn values. Does not modifie the Item.
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns>Tuple of (int sellIn, int quality)</returns>
         private static (int sellIn, int quality) BackstagePassesEndOfDayAdjustment(Item item)
         {
             var newQuality = item.SellIn switch
@@ -68,9 +72,26 @@
             return (item.SellIn - 1, newQuality);
         }
 
-        private static (int sellIn, int quality) SulfurasEndOfDayAdjustment(Item item)
-            => (item.SellIn, item.Quality);
+        /// <summary>
+        /// Accepts an item and applies end of day quality adjustment rules applicable to Conjured items.
+        /// Returns the new Quality and SellIn values. Does not modifie the Item.
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns>Tuple of (int sellIn, int quality)</returns>
+        private static (int sellIn, int quality) ConjuredEndOfDayAdjustment(Item item)
+        {
+            var newQuality = item.SellIn > 0
+                        ? Math.Max(MinimumStandardQuality, item.Quality - 2)
+                        : Math.Max(MinimumStandardQuality, item.Quality - 4);
+            return (item.SellIn - 1, newQuality);
+        }
 
+        /// <summary>
+        /// Accepts an item and applies default end of day quality adjustment rules applicable to non-specialist items.
+        /// Returns the new Quality and SellIn values. Does not modifie the Item.
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns>Tuple of (int sellIn, int quality)</returns>
         private static (int sellIn, int quality) DefaultEndOfDayAdjustment(Item item)
         {
             var newQuality = item.SellIn > 0
@@ -78,5 +99,14 @@
                        : Math.Max(MinimumStandardQuality, item.Quality - 2);
             return (item.SellIn - 1, newQuality);
         }
+
+        /// <summary>
+        /// Accepts an item and applies end of day quality adjustment rules applicable to Sulfuras items.
+        /// Returns the new Quality and SellIn values. Does not modifie the Item.
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns>Tuple of (int sellIn, int quality)</returns>
+        private static (int sellIn, int quality) SulfurasEndOfDayAdjustment(Item item)
+            => (item.SellIn, item.Quality);       
     }
 }
