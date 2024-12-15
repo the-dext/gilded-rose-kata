@@ -17,6 +17,7 @@
         {
             foreach (var item in Items)
             {
+                // degrade quality before degrading sellin
                 if (item.Name != AgedBrie && item.Name != BackstagePasses)
                 {
                     if (item.Quality > 0)
@@ -54,11 +55,13 @@
                     }
                 }
 
+                // reduce sell-in
                 if (item.Name != Sulfuras)
                 {
                     item.SellIn--;
                 }
 
+                // degrade quality again when passed sell-in date
                 if (item.SellIn < 0)
                 {
                     if (item.Name != AgedBrie)
