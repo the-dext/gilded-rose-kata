@@ -111,5 +111,34 @@
 
             items[0].Quality.Should().Be(0);
         }
+
+        [Theory]
+        [Trait("Category", "Aged Brie")]
+        [InlineData("Aged Brie", 2, 3)]
+        [InlineData("Aged Brie", 1, 1)]
+
+        public void UpdateQuality_Quality_Should_Increase_For_AgedBrie(string itemName, int currentSellIn, int currentQuality)
+        {
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = currentQuality } };
+            GildedRose sut = new GildedRose(items);
+
+            sut.UpdateQuality();
+
+            items[0].Quality.Should().Be(currentQuality + 1);
+        }
+
+        [Fact]
+        [Trait("Category", "Aged Brie")]
+        [InlineData("Aged Brie", 2, 50)]
+
+        public void UpdateQuality_Quality_Should_Not_Increase_Beyond_50_For_AgedBrie()        
+        {
+            var items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 2, Quality = 50} };
+            GildedRose sut = new GildedRose(items);
+
+            sut.UpdateQuality();
+
+            items[0].Quality.Should().Be(50);
+        }
     }
 }
