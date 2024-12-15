@@ -33,6 +33,41 @@
         }
 
         [Theory]
+        [Trait("Category", "Legendary Item")]
+        [InlineData("Sulfuras, Hand of Ragnaros", 2)]
+        [InlineData("Sulfuras, Hand of Ragnaros", 0)]
+        [InlineData("Sulfuras, Hand of Ragnaros", -1)]
+
+        public void UpdateQuality_Should_Never_Reduce_SellIn_For_Sulfuras(string itemName, int currentSellIn)
+        {
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = 1 } };
+            GildedRose app = new GildedRose(items);
+
+            app.UpdateQuality();
+
+            // Sell in property should never be changed
+            items[0].SellIn.Should().Be(currentSellIn);
+        }
+
+        [Theory]
+        [Trait("Category", "Legendary Item")]
+        [InlineData("Sulfuras, Hand of Ragnaros", 2)]
+        [InlineData("Sulfuras, Hand of Ragnaros", 0)]
+        [InlineData("Sulfuras, Hand of Ragnaros", -1)]
+
+        public void UpdateQuality_Quality_Should_Never_Degrade_For_Sulfuras(string itemName, int currentSellIn)
+        {
+            const int Sulfuras_Quality = 80;
+            var items = new List<Item> { new Item { Name = itemName, SellIn = currentSellIn, Quality = Sulfuras_Quality } };
+            GildedRose app = new GildedRose(items);
+
+            app.UpdateQuality();
+
+            // Sell in property should never be changed
+            items[0].Quality.Should().Be(Sulfuras_Quality);
+        }
+
+        [Theory]
         [Trait("Category", "Standard Items")]
         [InlineData("+5 Dexterity Vest", 2)]
         [InlineData("Elixir of the Mongoose", 2)]
