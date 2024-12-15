@@ -61,18 +61,12 @@
                 }
 
                 // degrade quality again when passed sell-in date
-                if (item.Name == AgedBrie)
+                item.Quality = item.Name switch
                 {
-                    item.Quality = Math.Min(MaxQuality, item.Quality + 1);
-                }
-                else if (item.Name == BackstagePasses)
-                {
-                    item.Quality = 0;
-                }
-                else
-                {
-                    item.Quality = Math.Max(0, item.Quality - 1);
-                }                
+                    AgedBrie => Math.Min(MaxQuality, item.Quality + 1),
+                    BackstagePasses => 0,
+                    _ => Math.Max(0, item.Quality - 1)
+                };          
             }
         }
     }
